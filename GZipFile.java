@@ -1,18 +1,18 @@
 package Implements;
-
+/*
+ * import java.io.FileWriter;
+ * import java.util.ArrayList;
+ * import java.util.List;
+ * 
+*/
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import Implements.CSVReader;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.zip.GZIPInputStream;
-import java.util.ArrayList;
-import java.util.List;
 import Implements.Files;
-
 import java.util.*;
 
 public class GZipFile 
@@ -42,16 +42,24 @@ public class GZipFile
                 int len;
                 BufferedReader br = null;
                 String line = "";
+                String cvsSplitBy = ",";
+                String x;
+                int y;
+                Collection<Files> list = new ArrayList<Files>(); 
                 
                 while ((len = gzis.read(buffer)) > 0)
                 {
-
-                	try{
-                		br = new BufferedReader(new FileReader(OUTPUT_FILE));
-                		while ((line =br.readLine()) != null && ((line.startsWith("2016-") == true))) {
-                			System.out.println(line);
-                			out.write(buffer, 0, len);
-                	}
+                	out.write(buffer, 0, len);
+                	
+        		}
+                try{
+        			br = new BufferedReader(new FileReader(OUTPUT_FILE));
+        			while ((line = br.readLine()) != null) {
+        				String[] content = line.split(cvsSplitBy);
+        				String[] intContent = line.split(cvsSplitBy);
+        				if (content[0].startsWith("2016-") == true)
+        				list.add(new Files(content[0],content[14],content[1],content[5]));
+        			}
         		} catch(FileNotFoundException e) {
         			e.printStackTrace();
         		} catch (IOException e) {
@@ -65,12 +73,12 @@ public class GZipFile
         				}
         			}
         		}
-                }
-
+                
                 gzis.close();
             	out.close();
 
             	System.out.println("Done");
+            	System.out.println(list.size());
             	
         }
         catch(IOException ex)
