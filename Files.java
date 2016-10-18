@@ -2,11 +2,14 @@ package Implements;
 
 public class Files {
 	public String time;
-	public int delay, speed, usualSpeed, freeFlow, length, startPosLat, startPosLon, frc, fow, bearing;
-	String eventCode, category, roadNumber, openLRBinaryV3, dsegs;
-	public double dfp;
+	//public int delay, speed, usualSpeed, freeFlow, length, startPosLat, startPosLon, frc, fow, bearing;
+	String eventCode, category, roadNumber, openLRBinaryV3, dsegs,delay, speed, usualSpeed, freeFlow, length, startPosLat, startPosLon, frc, fow, bearing,dfp;
+	String totalDelay, totalLength;
+	int intDelay, intLength, intTotalDelay, intTotalLength;
+	//public double dfp;
 	
-	public Files(String time, String roadNumber, int delay, int length){
+	
+	public Files(String time, String roadNumber, String delay, String length){
 		super();
 		this.time = time;
 		this.roadNumber = roadNumber;
@@ -26,21 +29,28 @@ public class Files {
 	public void setRoadNumber(String roadNumber) {
 		this.roadNumber = roadNumber;
 	}
-	public int getDelay() {
+	public String getDelay() {
 		return delay;
 	}
-	public void setDelay(int delay){
+	public void setDelay(String delay){
 		this.delay = delay;
 	}
-	public int getLength() {
+	public int delayToInt() {
+		return Integer.parseInt(delay);
+	}
+	public String getLength() {
 		return length;
 	}
-	public void setLength(int length){
+	public void setLength(String length){
 		this.length = length;
 	}
-	
+	public int lengthToInt() {
+		return Integer.parseInt(length);
+	}
 	//@ overide
 	public String toString() {
-		return "Date-Time = " + time + "Road Number = " + roadNumber + "Delay = " + delay + "Length = " + length;
+		return time + "," + roadNumber + "," + delay + "," + length;
 	}
 }
+
+
