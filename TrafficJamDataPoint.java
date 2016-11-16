@@ -8,6 +8,8 @@ public class TrafficJamDataPoint {
 
 	private static final int COLUMN_LENGTH = 5;
 	
+
+
 	private final Instant time;
 	private float totalDelay;  // document unit
 	private float totalLength;
@@ -17,12 +19,26 @@ public class TrafficJamDataPoint {
 		this.time = time;
 	}
 	
-	public void addDataLine(String[] line){
+	public void addDataLine(String[] content){
 		count++;
-		totalDelay += Float.parseFloat(line[COLUMN_DELAY]);
-		totalLength += Float.parseFloat(line[COLUMN_LENGTH]);
+		totalDelay += Float.parseFloat(content[COLUMN_DELAY]);
+		totalLength += Float.parseFloat(content[COLUMN_LENGTH]);
 	}
-	
+	public Instant getTime() {
+		return time;
+	}
+
+	public float getTotalDelay() {
+		return totalDelay;
+	}
+
+	public float getTotalLength() {
+		return totalLength;
+	}
+
+	public int getCount() {
+		return count;
+	}
 	
 
 }
