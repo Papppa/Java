@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -31,13 +32,17 @@ import com.sun.jna.StringArray;
 
 public class MapLoader {
 	
-	private static final String fileSource = "mapdata/"; 
+	private static final String fileSource = "mapdata/";
+	private static final String finalCSVFile = "mapfile.csv";
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		// for testing
 		// Guava library: time measurement with StopWatch
 		MapLoader loaderTest = new MapLoader();
 		Map<Long, MapProperties> mapProperties = loaderTest.loadAll();
+		keyboardInput(mapProperties);
+		//random dsegID: 1171544345426846566
+		//writeFile(mapProperties);
 	}
 	
 	private Map<Long, MapProperties> loadAll() {
@@ -93,5 +98,34 @@ public class MapLoader {
 		       }
 		}
 		return rawDataList; 
+	}
+	
+	public static void writeFile(Map<Long, MapProperties> mapProperties) throws Exception {
+		FileWriter writer = new FileWriter(finalCSVFile);
+		for(int i=0;i<mapProperties.size(); i++){
+			CSVUtils.writeLine(writer, Arrays.asList("nodata"));
+		}
+		System.out.println("CSV File printed succesfully");
+		writer.flush();
+		writer.close();
+	}
+	public static void keyboardInput(Map<Long, MapProperties> mapProperties){
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("Type in the dsegID: ");
+		String dsegID = scanner.next();
+		if (dsegID.length()==19){
+			Long id = Long.parseLong(dsegID);
+			double startLat,startLon,endLat,endLon;
+			startLat=mapProperties.get(id).getStart().getLat();
+			startLon=mapProperties.get(id).getStart().getLon();
+			endLat=mapProperties.get(id).getEnd().getLat();
+			endLon=mapProperties.get(id).getEnd().getLon();
+			System.out.println("for the dsegID: " + dsegID);
+			System.out.println("the starting point is (Lat,Lon): "+ startLat + " , " + startLon);
+			//System.out.println("\tLatitude: " + startLat + "\tLongitude: " + startLon);
+			System.out.println("the end point is (Lat, Lon): " + endLat + " , " + endLon);
+			//System.out.println("\tLatitude: " + endLat + "\tLongitude: " + endLon);
+		}
+			
 	}
 }
