@@ -1,19 +1,11 @@
 package Implements;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.NavigableMap;
 
-public class DsegProperties {
+public class EveningDsegProperties {
 	
 	private static final int START_COLUMN = 11;
 	private static final int END_COLUMN = 12;
@@ -28,21 +20,29 @@ public class DsegProperties {
 	Instant time;
 	private float totalDelay;
 	private float totalLength;
-	private int count = 1;
-	private int timeDifference;
+	private float avgSpeed;
+	private int count;
+	private static int freeLineCount;
 	private String polyline;
 	private Instant timestamp;
 	private String dayProperty, timeProperty;
 	
+	private int timeDifference;
 	private float delay,speed, length, freeFloat, meanVehicles ,jamDelay, carDelay,density_cong,trafficDensity,NumberOfLanes,jamSpreadingSpeed,meanVehicles0;
 
-	private int dsegCount, emptyCellCount;
+	private int dsegCount,emptyCellCount;
 	
-	public DsegProperties(Instant time) {
+	public EveningDsegProperties(Instant time) {
 		this.time = time;
 	}
 	
-	public DsegProperties (String[] content, Long segmentID, Instant dateTime) {
+	public static int CalculateFreeLinesBetweenTimestamps(boolean freeLine){
+		if(freeLine == true)
+			freeLineCount = +1;
+		return freeLineCount;
+	}
+	
+	public EveningDsegProperties (String[] content, Long segmentID, Instant dateTime, List<Instant> timeStampList) {
 		dayProperty = Implements.EnumDayProperties.getWeekday(dateTime);
 		timeProperty = Implements.EnumDayProperties.getPeak(dateTime);
 		timestamp = dateTime;
@@ -89,14 +89,9 @@ public class DsegProperties {
 
 		// translate dsegs in Coordinates
 		//polyline = transformDsegToGeocoordninate(mapProperties,segmentID);
-		if(oneCellIsEmpty(content)){
-			emptyCellCount++;
-			saveIdsWithEmptyArrays(content,segmentID,emptyCellCount);
-		}
-		
-	}
 
-	public void updateDsegID (String[] content, Long segmentID, Instant dateTime, List<Instant> timeStampList) {
+	}
+	public void updateEveningDsegID (String[] content, Long segmentID, Instant dateTime, List<Instant> timeStampList) {
 		count++;
 		dayProperty = Implements.EnumDayProperties.getWeekday(dateTime);
 		timeProperty = Implements.EnumDayProperties.getPeak(dateTime);
@@ -147,11 +142,6 @@ public class DsegProperties {
 		jamDelay = meanVehicles; // [kfz*h]
 		meanVehicles0 = meanVehicles * (speed/freeFloat); // [kfz]
 		carDelay += (meanVehicles-meanVehicles0)*timeDifference/3600; // [kfz*h]
-		
-		if(oneCellIsEmpty(content)){
-			emptyCellCount++;
-			saveIdsWithEmptyArrays(content,segmentID,emptyCellCount);
-		}
 	}
 	
 	private static String transformDsegToGeocoordninate (Map<Long, MapProperties> mapProperties, Long segmentID){
@@ -174,25 +164,15 @@ public class DsegProperties {
 		return polyline;
 	}
 	
-	private void saveIdsWithEmptyArrays(String[] content, Long segmentID, int emptyCellCount) {
-		String space = ", ";
-		try(FileWriter fw = new FileWriter(DsegRanking.destinationFolder+"/"+DsegRanking.fileName+"_emptyArrays.csv", true);
-			    BufferedWriter bw = new BufferedWriter(fw);
-			    PrintWriter out = new PrintWriter(bw))
-			{
-			    out.println(timestamp +space+ segmentID.toString() +space+ emptyCellCount +space+ length+space+speed+space+freeFloat);
-			    //more code
-			} catch (IOException e) {
-			    //exception handling left as an exercise for the reader
-			}
+	public static int toIntExact(long value) {
+	    if ((int)value != value) {
+	        throw new ArithmeticException("integer overflow");
+	    }
+	    return (int)value;
 	}
 	
-	public int getTimeDifference() {
-		return timeDifference;
-	}
-
-	public float getMeanVehicles0() {
-		return meanVehicles0;
+	public static boolean isNullOrBlank(String param) {
+		return param == null || param.trim().length() == 0 || param.trim().isEmpty();
 	}
 	
 	public String getDayProperty() {
@@ -201,6 +181,10 @@ public class DsegProperties {
 
 	public float getTotalDelay() {
 		return totalDelay;
+	}
+	
+	public float getAvgSpeed() {
+		return avgSpeed;
 	}
 	
 	public float getSpeed() {
@@ -226,13 +210,10 @@ public class DsegProperties {
 		return timestamp;
 	}
 
+
 	public String getTimeProperty() {
 		return timeProperty;
 	}
-	public float getDelay() {
-		return delay;
-	}
-
 	public float getLength() {
 		return length;
 	}
@@ -252,20 +233,6 @@ public class DsegProperties {
 	public float getDensity_cong() {
 		return density_cong;
 	}
-	public static int toIntExact(long value) {
-	    if ((int)value != value) {
-	        throw new ArithmeticException("integer overflow");
-	    }
-	    return (int)value;
-	}
 	
-	public static boolean isNullOrBlank(String param) {
-		return param == null || param.trim().length() == 0 || param.trim().isEmpty();
-	}
-	
-	public static boolean oneCellIsEmpty(String[] content){
-		
-		return isNullOrBlank(content[COLUMN_LENGTH])==true || isNullOrBlank(content[COLUMN_FREEFLOAT])==true || isNullOrBlank(content[COLUMN_SPEED])==true;
-	}
 
 }
